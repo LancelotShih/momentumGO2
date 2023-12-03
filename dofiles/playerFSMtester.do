@@ -56,6 +56,22 @@ run 70 ns
 force directionDOWN 0
 run 20 ns
 force directionDOWN 1
+run 1 ns
+force directionDOWN 0
+force directionRIGHT 1
 run 70 ns
+force directionRIGHT 0
+run 20 ns
+force directionRIGHT 1
+run 70 ns
+force directionRIGHT 0
+run 20 ns
+force directionRIGHT 1
+run 70 ns
+force directionRIGHT 0
+run 20 ns
+force directionRIGHT 1
+run 70 ns
+force directionRIGHT 0
 
 run 100 ns
