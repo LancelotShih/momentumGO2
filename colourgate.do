@@ -4,27 +4,32 @@ vlib work
 # compile all verilog modules in mux.v to working dir
 # could also have multiple verilog files
 
-vlog TOPLEVEL.v
+vlog back_fore_mux.v
 
 #load simulation using mux as the top level simulation module
-vsim TOPLEVEL
+vsim colourGate
 
 #log all signals and add some signals to waveform window
 log -r {/*}
 add wave {/*}
 
+force x1 111111111
+force x2 101010101
+force backgroundSelect 0
+force foregroundSelect 1
 
-radix -unsigned
-force {CLOCK_50} 0 0ns, 1 10ns -repeat 20ns;
-force {KEY[0]} {0}
-run 40 ns
-force {KEY[0]} {1}
+force y1 111111111
+force y2 101010101
 
-run 30 ns
 
-force {KEY[1]} {0}
-run 30 ns
-force {KEY[1]} {1}
-run 50 ns
+force colour1 101
+force colour2 001
 
-run 3 ms
+force continue 0
+
+run 10 ns
+force continue 1 
+
+
+
+run 10 ns

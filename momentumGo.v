@@ -285,43 +285,43 @@ endmodule
 
 // ********************************* supplementary modules ******************************//
 
-
-module addressCounter(clk, reset, enable, address, doneAll); 
-
- 	input clk, reset, enable;
- 	output reg [7:0] address = 0;
-	output reg doneAll; 
-	
-
-	always@(posedge clk) 
-	begin
-		if(reset)
-		begin
-			doneAll <= 0;
-			address <= 0;
-		end
-		else if(enable) //
-		begin
-			if(address == 99) begin
-				doneAll <= 1;
-				address <= 0;
-			end
-			else begin
-				doneAll <= 0;
-				address <= address + 1;
-			end
-		end
-	end
- endmodule
-
-
-module addressToPosition(address, initX, initY, positionX, positionY);
-    input [7:0] address;
-    input [10:0] initX;
-    input [10:0] initY;
-    output [10:0] positionX;
-    output [10:0] positionY;
-
-    assign positionX = (address % 10) + initX;
-    assign positionY = ((address - (address % 10)) / 10) + initY;
-endmodule
+//
+//module addressCounter(clk, reset, enable, address, doneAll); 
+//
+// 	input clk, reset, enable;
+// 	output reg [7:0] address = 0;
+//	output reg doneAll; 
+//	
+//
+//	always@(posedge clk) 
+//	begin
+//		if(reset)
+//		begin
+//			doneAll <= 0;
+//			address <= 0;
+//		end
+//		else if(enable) //
+//		begin
+//			if(address == 99) begin
+//				doneAll <= 1;
+//				address <= 0;
+//			end
+//			else begin
+//				doneAll <= 0;
+//				address <= address + 1;
+//			end
+//		end
+//	end
+// endmodule
+//
+//
+//module addressToPosition(address, initX, initY, positionX, positionY);
+//    input [7:0] address;
+//    input [10:0] initX;
+//    input [10:0] initY;
+//    output [10:0] positionX;
+//    output [10:0] positionY;
+//
+//    assign positionX = (address % 10) + initX;
+//    assign positionY = ((address - (address % 10)) / 10) + initY;
+//endmodule

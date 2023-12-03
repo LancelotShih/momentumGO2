@@ -17,7 +17,7 @@ module buffer(clk, reset, enable, done);
 
 		else if(enable)
 		begin
-			if(buffer_counter == 50000000/120 - 1) //60Hz = 50000000 / 60 - 1
+			if(buffer_counter == 5000/120 - 1) //60Hz = 50000000 / 60 - 1
 			begin
 				done <= 1;
 				buffer_counter <= 0;
@@ -29,7 +29,6 @@ module buffer(clk, reset, enable, done);
 		end
 	end
 endmodule
-
 
 
 module buffer_short(clk, reset, enable, done);

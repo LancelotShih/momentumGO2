@@ -1,47 +1,50 @@
-
-
- module topLevel(CLOCK_50, KEY, LEDR, red_X, red_Y, blue_X , blue_Y, x, y, colour, plot_enable);
-
-	output wire [2:0] colour;
-	output wire [9:0] x;
-	output wire [8:0] y;
-	output [3:0] LEDR;
- output plot_enable;
-
-	
-	input CLOCK_50;
-	input [3:0] KEY;
-	input [3:0]red_X, red_Y, blue_X, blue_Y;
-
-     wire [2:0] loadColour;
-     wire readMemory, writeMemory;
-     wire[8:0] address_a, box_address;
-     wire draw_enable_background, draw_enable_foreground;
-     wire reset_draw_background, reset_draw_foreground;
-     wire finished;
-
-
-     wire[3:0] positionX, positionY;
-     wire[10:0] pixelX;
-     wire[10:0] pixelY;
-
-    wire filler, filler2;
-    wire [2:0] colourfiller, colourfiller2;
-
-
-     gameBoardFSM GB1(.clock(CLOCK_50), .reset(!KEY[0]), .trigger(!KEY[3]), .red_X(red_X), .red_Y(red_Y), .blue_X(blue_X), .blue_Y(blue_Y), .finished(finished), .loadColour(loadColour), .plot_enable(plot_enable), 
-     .writeMemory(writeMemory), .readMemory(readMemory), .address_a(address_a), .box_address(box_address), .draw_enable_background(draw_enable_background), .draw_enable_foreground(draw_enable_foreground), 
-     .reset_draw_background(reset_draw_background), .reset_draw_foreground(reset_draw_foreground));
-
-     BRAM B1(.address_a(address_a), .address_b(box_address), .clock(CLOCK_50), .data_a(loadColour), .data_b( colourfiller), .rden_a( filler), .rden_b(readMemory), .wren_a(writeMemory), .wren_b(filler2 ), .q_a(colourfiller2 ), .q_b(colour));
-
-     addressToPosition ATP1(.address(box_address), .positionX(positionX), .positionY(positionY));
-
-     positionToPixel PTP1(.positionX(positionX), .positionY(positionY), .pixelX(pixelX), .pixelY(pixelY));
-
-     draw_Back D1(.clock(CLOCK_50), .reset(reset_draw_background), .enable_draw(draw_enable_background), .initial_xPosition(pixelX), .initial_yPosition(pixelY), .xOutput(x), .yOutput(y), .finished(finished) );
-
-endmodule
+//
+//
+// module topLevel(CLOCK_50, KEY, LEDR, red_X, red_Y, blue_X , blue_Y, x, y, colour, plot_enable);
+//
+//	output wire [2:0] colour;
+//	output wire [9:0] x;
+//	output wire [8:0] y;
+//	output [3:0] LEDR;
+// output plot_enable;
+//
+//	
+//	input CLOCK_50;
+//	input [3:0] KEY;
+//	input [3:0]red_X, red_Y, blue_X, blue_Y;
+//
+//     wire [2:0] loadColour;
+//     wire readMemory, writeMemory;
+//     wire[8:0] address_a, box_address;
+//     wire draw_enable_background, draw_enable_foreground;
+//     wire reset_draw_background, reset_draw_foreground;
+//     wire finished;
+//
+//
+//     wire[3:0] positionX, positionY;
+//     wire[9:0] pixelX, pixelX2;
+//     wire[8:0] pixelY, pixelY2;
+//
+//    wire filler, filler2;
+//    wire [2:0] colourfiller, colourfiller2;
+//
+//
+//     gameBoardFSM GB1(.clock(CLOCK_50), .reset(!KEY[0]), .trigger(!KEY[3]), .red_X(red_X), .red_Y(red_Y), .blue_X(blue_X), .blue_Y(blue_Y), .finished(finished), .loadColour(loadColour), .plot_enable(plot_enable), 
+//     .writeMemory(writeMemory), .readMemory(readMemory), .address_a(address_a), .box_address(box_address), .draw_enable_background(draw_enable_background), .draw_enable_foreground(draw_enable_foreground), 
+//     .reset_draw_background(reset_draw_background), .reset_draw_foreground(reset_draw_foreground));
+//
+//     BRAM B1(.address_a(address_a), .address_b(box_address), .clock(CLOCK_50), .data_a(loadColour), .data_b( colourfiller), .rden_a( filler), .rden_b(readMemory), .wren_a(writeMemory), .wren_b(filler2 ), .q_a(colourfiller2 ), .q_b(colour));
+//
+//     addressToPosition ATP1(.address(box_address), .positionX(positionX), .positionY(positionY));
+//     addressToPosition ATP2_note_position_is_pixel(.address(100_address), .positionX(pixelX2), .positionY(pixelY2));
+//     
+//     positionToPixel PTP1(.positionX(positionX), .positionY(positionY), .pixelX(pixelX), .pixelY(pixelY));
+//
+//     draw_Back D1(.clock(CLOCK_50), .reset(reset_draw_background), .enable_draw(draw_enable_background), .initial_xPosition(pixelX), .initial_yPosition(pixelY), .xOutput(x), .yOutput(y), .finished(finished) );
+//
+//     draw_Animation DA1(.clock(CLOCK_50), .reset(reset_draw_foreground), .enable(draw_enable_foreground), .initial_xPosition(pixelX2), .initial_yPosition(pixelY2));
+//
+//endmodule
 
 
 module gameBoardFSM(
@@ -52,7 +55,7 @@ module gameBoardFSM(
                     loadColour, plot_enable,
 
                     writeMemory, readMemory, 
-                    address_a, box_address,
+                    address_a, box_address, address100,
 
                     draw_enable_background, draw_enable_foreground, //these shall enable their respective draw counters and MUX to the VGA. Foreground things will communicate directly with bomb module and playerFSM
                     reset_draw_background, reset_draw_foreground
@@ -82,7 +85,6 @@ positionToAddress BluePosToAddress(blue_X, blue_Y, blue_address);
 
 //DRAW///
 output reg draw_enable_background, reset_draw_background;
-
 ///
 
 
@@ -96,8 +98,9 @@ buffer B1(.clk(clock), .reset(reset_buffer), .enable(buffer_enable), .done(doneB
 
 //Counter100//////////////////////////////////////////////
 output reg reset_draw_foreground, draw_enable_foreground;
+output [8:0] address100;
 wire done100Count;
-addressCounter100 AC100(.clk(clock), .reset(reset_draw_foreground), .enable(draw_enable_foreground), .doneAll(done100Count));
+addressCounter100 AC100(.clock(clock), .reset(reset_draw_foreground), .enable(draw_enable_foreground), .address(address100), .doneAll(done100Count));
 
 
 /////////////////////////////////////////////////////////
@@ -107,7 +110,6 @@ addressCounter100 AC100(.clk(clock), .reset(reset_draw_foreground), .enable(draw
 reg reset_counter255, count255_enable;  
 output [8:0] box_address;
 wire doneBackground;
-
 addressCounter AC1(.clock(clock), .reset(reset_counter255), .enable(count255_enable), .done(finished), .address(box_address), .doneAll(doneBackground));
 ////////////////////////////////////////////////////////////
 
@@ -393,7 +395,7 @@ begin: state_transition_table
                     buffer_enable = 1;
                     lastFrame = 1;
                     draw_enable_foreground = 1;
-					LEDR[1] = 1;
+						  LEDR[1] = 1;
                 end
 
                 frame2: begin
@@ -454,7 +456,7 @@ module rateDivider(clock50, clock25);
 endmodule
 
 
-module draw_Animation(clock, reset, enable_draw, initial_xPosition, initial_yPosition, xOutput, yOutput, iColour, oColour, finished, continue );
+module draw_Animation(clock, reset, enable_draw, initial_xPosition, initial_yPosition, xOutput, yOutput, iColour, oColour, finished, ANDplot_enable );
 
 //draws player model 10x10
 // has wire continue which acts as a way to not the plot for areas with MIF = 000
@@ -473,7 +475,7 @@ module draw_Animation(clock, reset, enable_draw, initial_xPosition, initial_yPos
 	output [9:0]xOutput;
 	output [8:0]yOutput;
 	output reg finished = 0;
-    output reg continue = 1; 
+    output reg ANDplot_enable = 1; 
 
     reg [20:0]yCounter = 0;
 	reg [9:0]movingX = 0;
@@ -523,13 +525,14 @@ module draw_Animation(clock, reset, enable_draw, initial_xPosition, initial_yPos
 		end
 	end
 
+    //ANTICOLOUR HANDLING
     always @ (posedge clock) begin
         if(iColour == 0) begin
-            continue <= 0;
+            ANDplot_enable <= 0;
         end
         else begin
             oColour <= iColour;
-            continue <= 1;
+            ANDplot_enable <= 1;
         end
     end
 endmodule
